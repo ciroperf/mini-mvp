@@ -51,6 +51,15 @@ curl -X POST http://localhost:8000/notes \
   -d '{"title": "Spesa", "content": "Latte e pane"}'
 ```
 
+## Caching
+
+`GET /notes` e `GET /notes/{id}` sono cache-aside su Redis (TTL 120s): in
+caso di miss si legge da Postgres e si scrive in cache, altrimenti si
+risponde direttamente dalla cache. Le scritture (`POST`/`PUT`/`DELETE`)
+vanno sempre su Postgres per prime e poi invalidano le chiavi coinvolte,
+cosi' la cache non diventa mai fonte di verita'. Se `REDIS_URL` non e'
+impostata (es. nei test) si usa un fallback in-memory di processo.
+
 ## Test
 
 Con Postgres e Redis gia' su (`docker compose up -d postgres redis`):
