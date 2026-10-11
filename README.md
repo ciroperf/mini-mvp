@@ -60,6 +60,15 @@ vanno sempre su Postgres per prime e poi invalidano le chiavi coinvolte,
 cosi' la cache non diventa mai fonte di verita'. Se `REDIS_URL` non e'
 impostata (es. nei test) si usa un fallback in-memory di processo.
 
+## Osservabilita'
+
+- `GET /metrics` espone le metriche in formato Prometheus (`text/plain`):
+  numero di richieste HTTP (`http_requests_total`, per metodo/path/status),
+  latenza delle richieste (`http_request_duration_seconds`) e accessi alla
+  cache (`cache_requests_total`, per esito hit/miss).
+- Ogni richiesta produce su stdout una riga di log JSON con timestamp,
+  livello, path, status e durata in millisecondi (`duration_ms`).
+
 ## Test
 
 Con Postgres e Redis gia' su (`docker compose up -d postgres redis`):
