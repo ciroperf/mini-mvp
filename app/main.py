@@ -1,15 +1,17 @@
 import json
 
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Response
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.cache import CACHE_TTL_SECONDS, CacheClient, get_cache
 from app.db import get_db
 from app.models import Note
+from app.observability import metrics_response, observability_middleware, record_cache_result
 from app.schemas import NoteCreate, NoteOut, NoteUpdate
 
 app = FastAPI()
+app.middleware("http")(observability_middleware)
 
 NOTES_LIST_CACHE_KEY = "notes:list"
 
@@ -21,6 +23,11 @@ def _note_cache_key(note_id: int) -> str:
 @app.get("/health")
 async def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.get("/metrics")
+async def metrics() -> Response:
+    return metrics_response()
 
 
 @app.post("/notes", response_model=NoteOut, status_code=201)
@@ -43,6 +50,7 @@ async def list_notes(
     cache: CacheClient = Depends(get_cache),  # noqa: B008
 ) -> list[NoteOut]:
     cached = await cache.get(NOTES_LIST_CACHE_KEY)
+    record_cache_result(hit=cached is not None)
     if cached is not None:
         return [NoteOut(**item) for item in json.loads(cached)]
 
@@ -64,6 +72,7 @@ async def get_note(
 ) -> NoteOut:
     cache_key = _note_cache_key(note_id)
     cached = await cache.get(cache_key)
+    record_cache_result(hit=cached is not None)
     if cached is not None:
         return NoteOut(**json.loads(cached))
 
