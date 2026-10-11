@@ -90,4 +90,22 @@ pytest
 
 ## Screenshot
 
-<!-- TODO: aggiungere uno screenshot o una demo (curl/HTTPie) dell'API in uso -->
+<!-- TODO: sostituire con uno screenshot reale dell'API in uso -->
+
+In attesa di uno screenshot reale, un esempio testuale di chiamata
+all'API:
+
+```bash
+curl -X POST http://localhost:8000/notes \
+  -H 'Content-Type: application/json' \
+  -d '{"title": "Spesa", "content": "Latte e pane"}'
+```
+
+```json
+{
+  "id": 1,
+  "title": "Spesa",
+  "content": "Latte e pane",
+  "created_at": "2026-10-11T09:30:00Z"
+}
+```
