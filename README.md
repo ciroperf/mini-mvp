@@ -35,6 +35,22 @@ Le migrazioni Alembic vanno applicate manualmente dopo il primo avvio:
 docker compose exec api alembic upgrade head
 ```
 
+## API
+
+CRUD sulle note, con sessione SQLAlchemy async su Postgres:
+
+- `POST /notes` — crea una nota (`title`, `content`)
+- `GET /notes` — elenca le note
+- `GET /notes/{id}` — dettaglio di una nota (404 se non esiste)
+- `PUT /notes/{id}` — aggiorna `title` e `content` di una nota (404 se non esiste)
+- `DELETE /notes/{id}` — elimina una nota (404 se non esiste)
+
+```bash
+curl -X POST http://localhost:8000/notes \
+  -H 'Content-Type: application/json' \
+  -d '{"title": "Spesa", "content": "Latte e pane"}'
+```
+
 ## Test
 
 Con Postgres e Redis gia' su (`docker compose up -d postgres redis`):
