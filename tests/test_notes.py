@@ -1,11 +1,14 @@
 import pytest
 from fastapi.testclient import TestClient
 
+from app.db import engine
 from app.main import app
+from app.models import Base
 
 
 @pytest.fixture(scope="module")
 def client():
+    Base.metadata.create_all(bind=engine.sync_engine)
     with TestClient(app) as test_client:
         yield test_client
 
