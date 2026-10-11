@@ -1,3 +1,5 @@
+import asyncio
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -8,7 +10,12 @@ from app.models import Base
 
 @pytest.fixture(scope="module")
 def client():
-    Base.metadata.create_all(bind=engine.sync_engine)
+    async def init_db() -> None:
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+
+    asyncio.run(init_db())
+
     with TestClient(app) as test_client:
         yield test_client
 
