@@ -69,6 +69,15 @@ impostata (es. nei test) si usa un fallback in-memory di processo.
 - Ogni richiesta produce su stdout una riga di log JSON con timestamp,
   livello, path, status e durata in millisecondi (`duration_ms`).
 
+## Deploy su Kubernetes
+
+Manifest di esempio (Deployment, Service, ConfigMap, Secret, HPA) in
+`k8s/`, con istruzioni per minikube/EKS in `k8s/README.md`:
+
+```bash
+kubectl apply --dry-run=client -f k8s/
+```
+
 ## Test
 
 Con Postgres e Redis gia' su (`docker compose up -d postgres redis`):
