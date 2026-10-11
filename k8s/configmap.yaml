@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mini-mvp-config
+data:
+  # URL di Redis: nessuna credenziale incorporata, quindi non sensibile.
+  REDIS_URL: "redis://mini-mvp-redis:6379/0"

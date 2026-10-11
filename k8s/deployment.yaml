@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mini-mvp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mini-mvp
+  template:
+    metadata:
+      labels:
+        app: mini-mvp
+    spec:
+      # Da' tempo a uvicorn di drenare le richieste in corso dopo il SIGTERM
+      # inviato da Kubernetes prima del kill definitivo.
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: api
+          # Sostituire con l'immagine pubblicata dalla pipeline CI.
+          image: mini-mvp:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: mini-mvp-config
+            - secretRef:
+                name: mini-mvp-secrets
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
